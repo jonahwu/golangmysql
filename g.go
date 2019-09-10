@@ -14,6 +14,7 @@ type Person struct {
 }
 
 const getCustomerWLastName = "SELECT * FROM customer WHERE lastname = ?"
+const getProduct = "SELECT customer.id,customer.firstname,customer.lastname,product.productname FROM customer JOIN product WHERE customer.id = product.id"
 
 func main() {
 	//fmt.Println("vim-go")
@@ -57,6 +58,22 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println(result)
+
+	rowsp, err := db.Query(getProduct)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rowsp.Close()
+	var product string
+	for rowsp.Next() {
+		var person Person
+
+		if err := rowsp.Scan(&person.Id, &person.FirstName, &person.LastName, &product); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("show:", person.Id, person.FirstName, person.LastName, product)
+	}
+
 	/*
 			err := db.QueryRow(`
 		    SELECT
