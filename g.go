@@ -57,5 +57,16 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println(result)
+	/*
+			err := db.QueryRow(`
+		    SELECT
+		        db1.users.username
+		    FROM
+		        db1.users
+		    JOIN
+		        db2.comments
+		        ON db1.users.id = db2.comments.username_id
+		`).Scan(&username)
+	*/
 
 }
