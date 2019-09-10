@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	//	"strings"
 )
 
 type Person struct {
@@ -52,10 +53,26 @@ func SomeHandler(db *sql.DB) gin.HandlerFunc {
 	return gin.HandlerFunc(fn)
 }
 
+//curl http://localhost:8080/qs?test=23&&test1=lala
+//curl "http://localhost:8080/qs?test=23&test1=lala"  need "
+func QueryString(db *sql.DB) gin.HandlerFunc {
+	fn := func(c *gin.Context) {
+		// Your handler code goes in here - e.g.
+		q1 := c.Query("test")
+		fmt.Println(q1)
+		q2 := c.Query("test1")
+		fmt.Println(q2)
+		c.String(200, "ret")
+	}
+
+	return gin.HandlerFunc(fn)
+}
+
 func main() {
 	//fmt.Println("vim-go")
 	//where root is user, promise is password, /test is database name 127.0.0.1:3306 is mysql location
 	db, err := sql.Open("mysql", "root:promise@tcp(127.0.0.1:3306)/test?parseTime=true")
+
 	defer db.Close()
 	if err != nil {
 		log.Fatalln(err)
@@ -128,5 +145,6 @@ func main() {
 
 	router := gin.Default()
 	router.GET("/test", SomeHandler(db))
+	router.GET("/qs", QueryString(db))
 	router.Run(":8080")
 }
