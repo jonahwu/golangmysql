@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 )
@@ -13,17 +14,43 @@ type Person struct {
 	LastName  string `json:"last_name" form:"last_name"`
 }
 
-const getCustomerWLastName = `SELECT * FROM customer 
+const SQLgetCustomerWLastName = `SELECT * FROM customer 
                               WHERE lastname = ?`
 
-const getProduct = `SELECT customer.id,customer.firstname,customer.lastname,product.productname 
+const SQLgetProduct = `SELECT customer.id,customer.firstname,customer.lastname,product.productname 
                     FROM customer 
 					JOIN product 
 					WHERE customer.id = product.id`
 
-const UpdateProduct = `UPDATE product 
+const SQLUpdateProduct = `UPDATE product 
                       SET productname =? 
 					  WHERE id = ?`
+const SQLInsertCustomer = `
+           INSERT INTO customer (firstname, lastname) VALUES (?, ?)
+          `
+
+func SomeHandler(db *sql.DB) gin.HandlerFunc {
+	fn := func(c *gin.Context) {
+		// Your handler code goes in here - e.g.
+		rows, err := db.Query(SQLgetCustomerWLastName, "Bill")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+		for rows.Next() {
+			var person Person
+
+			if err := rows.Scan(&person.Id, &person.FirstName, &person.LastName); err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println("show:", person.Id, person.FirstName, person.LastName)
+		}
+
+		c.String(200, "ret")
+	}
+
+	return gin.HandlerFunc(fn)
+}
 
 func main() {
 	//fmt.Println("vim-go")
@@ -34,8 +61,8 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	db.SetMaxIdleConns(20)
-	db.SetMaxOpenConns(20)
+	db.SetMaxIdleConns(20000)
+	db.SetMaxOpenConns(20000)
 
 	if err := db.Ping(); err != nil {
 		log.Fatalln(err)
@@ -44,7 +71,7 @@ func main() {
 	//rows, err := db.Query("SELECT * FROM customer")
 	//rows, err := db.Query("SELECT * FROM customer WHERE id = ?", 1)
 	//rows, err := db.Query("SELECT * FROM customer WHERE lastname = ?", "Bill")
-	rows, err := db.Query(getCustomerWLastName, "Bill")
+	rows, err := db.Query(SQLgetCustomerWLastName, "Bill")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,18 +84,23 @@ func main() {
 		}
 		fmt.Println("show:", person.Id, person.FirstName, person.LastName)
 	}
-
+	/*
+		result, err := db.Exec(
+			"INSERT INTO customer (firstname, lastname) VALUES (?, ?)",
+			"syhlion",
+			"bill",
+		)
+	*/
 	result, err := db.Exec(
-		"INSERT INTO customer (firstname, lastname) VALUES (?, ?)",
-		"syhlion",
-		"bill",
-	)
+		SQLInsertCustomer,
+		"syhlion", "bill")
+
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println(result)
 
-	rowsp, err := db.Query(getProduct)
+	rowsp, err := db.Query(SQLgetProduct)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -85,7 +117,7 @@ func main() {
 
 	// update product
 	resultu, err := db.Exec(
-		UpdateProduct,
+		SQLUpdateProduct,
 		"Cake",
 		1,
 	)
@@ -94,16 +126,7 @@ func main() {
 	}
 	fmt.Println(resultu)
 
-	/*
-			err := db.QueryRow(`
-		    SELECT
-		        db1.users.username
-		    FROM
-		        db1.users
-		    JOIN
-		        db2.comments
-		        ON db1.users.id = db2.comments.username_id
-		`).Scan(&username)
-	*/
-
+	router := gin.Default()
+	router.GET("/test", SomeHandler(db))
+	router.Run(":8080")
 }
