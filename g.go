@@ -13,9 +13,17 @@ type Person struct {
 	LastName  string `json:"last_name" form:"last_name"`
 }
 
-const getCustomerWLastName = "SELECT * FROM customer WHERE lastname = ?"
-const getProduct = "SELECT customer.id,customer.firstname,customer.lastname,product.productname FROM customer JOIN product WHERE customer.id = product.id"
-const UpdateProduct = "UPDATE product SET productname =? WHERE id = ?"
+const getCustomerWLastName = `SELECT * FROM customer 
+                              WHERE lastname = ?`
+
+const getProduct = `SELECT customer.id,customer.firstname,customer.lastname,product.productname 
+                    FROM customer 
+					JOIN product 
+					WHERE customer.id = product.id`
+
+const UpdateProduct = `UPDATE product 
+                      SET productname =? 
+					  WHERE id = ?`
 
 func main() {
 	//fmt.Println("vim-go")
