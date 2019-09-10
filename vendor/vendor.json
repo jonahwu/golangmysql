@@ -1,0 +1,35 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"path": "-u",
+			"revision": ""
+		},
+		{
+			"path": "appengine/cloudsql",
+			"revision": ""
+		},
+		{
+			"path": "get",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "hrzwCUn2sVcz/6G1Po5GaoozW6I=",
+			"path": "github.com/go-sql-driver/mysql",
+			"revision": "d9aa6d3abe0f1072adb4aa71e1eb1d3eb3d3921c",
+			"revisionTime": "2019-09-05T03:54:07Z"
+		},
+		{
+			"path": "go",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "LiyXfqOzaeQ8vgYZH3t2hUEdVTw=",
+			"path": "google.golang.org/appengine/cloudsql",
+			"revision": "5f2a59506353b8d5ba8cbbcd9f3c1f41f1eaf079",
+			"revisionTime": "2019-08-28T20:17:10Z"
+		}
+	],
+	"rootPath": "github.com/jj"
+}
