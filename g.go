@@ -13,6 +13,8 @@ type Person struct {
 	LastName  string `json:"last_name" form:"last_name"`
 }
 
+const getCustomerWLastName = "SELECT * FROM customer WHERE lastname = ?"
+
 func main() {
 	//fmt.Println("vim-go")
 	//where root is user, promise is password, /test is database name 127.0.0.1:3306 is mysql location
@@ -31,7 +33,8 @@ func main() {
 
 	//rows, err := db.Query("SELECT * FROM customer")
 	//rows, err := db.Query("SELECT * FROM customer WHERE id = ?", 1)
-	rows, err := db.Query("SELECT * FROM customer WHERE lastname = ?", "Bill")
+	//rows, err := db.Query("SELECT * FROM customer WHERE lastname = ?", "Bill")
+	rows, err := db.Query(getCustomerWLastName, "Bill")
 	if err != nil {
 		log.Fatal(err)
 	}
