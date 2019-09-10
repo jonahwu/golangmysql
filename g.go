@@ -15,6 +15,7 @@ type Person struct {
 
 const getCustomerWLastName = "SELECT * FROM customer WHERE lastname = ?"
 const getProduct = "SELECT customer.id,customer.firstname,customer.lastname,product.productname FROM customer JOIN product WHERE customer.id = product.id"
+const UpdateProduct = "UPDATE product SET productname =? WHERE id = ?"
 
 func main() {
 	//fmt.Println("vim-go")
@@ -73,6 +74,17 @@ func main() {
 		}
 		fmt.Println("show:", person.Id, person.FirstName, person.LastName, product)
 	}
+
+	// update product
+	resultu, err := db.Exec(
+		UpdateProduct,
+		"Cake",
+		1,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(resultu)
 
 	/*
 			err := db.QueryRow(`
