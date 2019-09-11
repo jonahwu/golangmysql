@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"net/http"
 	//  "strings"
 )
 
@@ -23,7 +24,8 @@ func POSTLoc(db *sql.DB) gin.HandlerFunc {
 		fmt.Println(Name)
 		if Name == "" {
 			log.Println("no")
-			c.String(403, "Need Name information in querystring")
+			//	c.String(403, "Need Name information in querystring")
+			c.JSON(http.StatusMisdirectedRequest, gin.H{"status": "store data finished"})
 			c.Abort()
 			return
 		}
@@ -39,7 +41,8 @@ func POSTLoc(db *sql.DB) gin.HandlerFunc {
 		}
 		fmt.Println(resultu)
 		fmt.Println("show data")
-		c.String(200, "ret")
+		//c.String(200, "ret")
+		c.JSON(http.StatusOK, gin.H{"status": "store data finished"})
 	}
 	return gin.HandlerFunc(fn)
 }
@@ -61,7 +64,8 @@ func GetLoc(db *sql.DB) gin.HandlerFunc {
 			}
 			fmt.Println("show loc:", loc.Lat, loc.Lon)
 		}
-		c.String(200, "ret")
+		//c.String(200, "ret")
+		c.JSON(http.StatusOK, gin.H{"status": "GetLoc"})
 	}
 	return gin.HandlerFunc(fn)
 }
