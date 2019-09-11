@@ -50,6 +50,8 @@ func POSTLoc(db *sql.DB) gin.HandlerFunc {
 //curl http://localhost:8080/gpsloc
 func GetLoc(db *sql.DB) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
+		var loc GPSLoc
+		var locs []GPSLoc
 		cid := c.Query("cid")
 		rows, err := db.Query(SQLGetGpsLocFromName, cid)
 		if err != nil {
@@ -57,15 +59,16 @@ func GetLoc(db *sql.DB) gin.HandlerFunc {
 		}
 		defer rows.Close()
 		for rows.Next() {
-			var loc GPSLoc
-
 			if err := rows.Scan(&loc.Lat, &loc.Lon); err != nil {
 				log.Fatal(err)
 			}
+			locs = append(locs, loc)
 			fmt.Println("show loc:", loc.Lat, loc.Lon)
 		}
 		//c.String(200, "ret")
-		c.JSON(http.StatusOK, gin.H{"status": "GetLoc"})
+		//c.JSON(http.StatusOK, gin.H{"status": "GetLoc"})
+		//c.JSON(http.StatusOK, gin.H{"status": loc})
+		c.JSON(http.StatusOK, gin.H{"status": locs})
 	}
 	return gin.HandlerFunc(fn)
 }
