@@ -13,14 +13,24 @@ const SQLGetGpsLocFromName = `
                               SELECT ST_Longitude(loc),ST_Latitude(loc) FROM gps_data
                               WHERE name = ?`
 
-//curl -X POST  http://localhost:8080/gpsloc
+//curl -X POST  "http://localhost:8080/gpsloc?lat=23.3&lon=123.6"
+//curl -X POST  "http://localhost:8080/gpsloc?lat=23.3&lon=123.6&Name=Mary"
 func POSTLoc(db *sql.DB) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
-		Lon := "63.3"
-		Lat := "123.3"
-		Name := "Mary"
+		Lat := c.Query("lat")
+		Lon := c.Query("lon")
+		Name := c.Query("Name")
+		fmt.Println(Name)
+		if Name == "" {
+			log.Println("no")
+			c.String(403, "Need Name information in querystring")
+			c.Abort()
+			return
+		}
+		//Name := "Mary"
 		// can not write to const with not Simply question mark
-		StoreGPS := fmt.Sprintf("INSERT INTO gps_data (name,loc) VALUES(\"%s\",ST_GeomFromText('POINT(%s %s)',4326))", Name, Lon, Lat)
+		// we must to store lat(23), lon(123)
+		StoreGPS := fmt.Sprintf("INSERT INTO gps_data (name,loc) VALUES(\"%s\",ST_GeomFromText('POINT(%s %s)',4326))", Name, Lat, Lon)
 		fmt.Println(StoreGPS)
 		resultu, err := db.Exec(StoreGPS)
 		if err != nil {
@@ -29,6 +39,7 @@ func POSTLoc(db *sql.DB) gin.HandlerFunc {
 		}
 		fmt.Println(resultu)
 		fmt.Println("show data")
+		c.String(200, "ret")
 	}
 	return gin.HandlerFunc(fn)
 }
@@ -36,7 +47,8 @@ func POSTLoc(db *sql.DB) gin.HandlerFunc {
 //curl http://localhost:8080/gpsloc
 func GetLoc(db *sql.DB) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
-		rows, err := db.Query(SQLGetGpsLocFromName, "Eason")
+		Name := c.Query("Name")
+		rows, err := db.Query(SQLGetGpsLocFromName, Name)
 		if err != nil {
 			log.Fatal(err)
 		}

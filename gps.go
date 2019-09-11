@@ -16,8 +16,8 @@ type Person struct {
 }
 
 type GPSLoc struct {
-	Lon float64 `json:"lon" form:"lon"`
-	Lat float64 `json:"lat" form:"lat"`
+	Lon string `json:"lon" form:"lon"`
+	Lat string `json:"lat" form:"lat"`
 }
 
 const SQLgetCustomerWLastName = `SELECT * FROM customer 

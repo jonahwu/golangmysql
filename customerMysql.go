@@ -11,7 +11,7 @@ import (
 
 const SQLGetCustomer = `SELECT BIN_TO_UUID(customer_id) FROM customers WHERE mail = ?`
 
-//curl -X POST  http://localhost:8080/gpsloc
+//curl   http://localhost:8080/customer?mail=junmein@hotmail.com
 func GetCustomer(db *sql.DB) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		// can not write to const with not Simply question mark
