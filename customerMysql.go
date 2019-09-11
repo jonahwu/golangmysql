@@ -9,7 +9,8 @@ import (
 	//  "strings"
 )
 
-const SQLGetCustomer = `SELECT BIN_TO_UUID(customer_id) FROM customers WHERE mail = ?`
+//const SQLGetCustomer = `SELECT BIN_TO_UUID(customer_id) FROM customers WHERE mail = ?`
+const SQLGetCustomer = `SELECT customer_id FROM customers WHERE mail = ?`
 
 //curl   http://localhost:8080/customer?mail=junmein@hotmail.com
 func GetCustomer(db *sql.DB) gin.HandlerFunc {
