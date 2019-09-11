@@ -15,6 +15,11 @@ type Person struct {
 	LastName  string `json:"last_name" form:"last_name"`
 }
 
+type GPSLoc struct {
+	Lon float64 `json:"lon" form:"lon"`
+	Lat float64 `json:"lat" form:"lat"`
+}
+
 const SQLgetCustomerWLastName = `SELECT * FROM customer 
                               WHERE lastname = ?`
 
@@ -70,7 +75,7 @@ func QueryString(db *sql.DB) gin.HandlerFunc {
 func main() {
 	//fmt.Println("vim-go")
 	//where root is user, promise is password, /test is database name 127.0.0.1:3306 is mysql location
-	db, err := sql.Open("mysql", "root:promise123@tcp(127.0.0.1:3306)/test?parseTime=true")
+	db, err := sql.Open("mysql", "root:promise123@tcp(127.0.0.1:3306)/gps?parseTime=true")
 	defer db.Close()
 	if err != nil {
 		log.Fatalln(err)
@@ -85,63 +90,25 @@ func main() {
 	//rows, err := db.Query("SELECT * FROM customer")
 	//rows, err := db.Query("SELECT * FROM customer WHERE id = ?", 1)
 	//rows, err := db.Query("SELECT * FROM customer WHERE lastname = ?", "Bill")
-	rows, err := db.Query(SQLgetCustomerWLastName, "Bill")
+	rows, err := db.Query(SQLGetGpsLocFromName, "Eason")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var person Person
+		var loc GPSLoc
 
-		if err := rows.Scan(&person.Id, &person.FirstName, &person.LastName); err != nil {
+		if err := rows.Scan(&loc.Lat, &loc.Lon); err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println("show:", person.Id, person.FirstName, person.LastName)
+		fmt.Println("show loc:", loc.Lat, loc.Lon)
 	}
-	/*
-		result, err := db.Exec(
-			"INSERT INTO customer (firstname, lastname) VALUES (?, ?)",
-			"syhlion",
-			"bill",
-		)
-	*/
-	result, err := db.Exec(
-		SQLInsertCustomer,
-		"syhlion", "bill")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(result)
-
-	rowsp, err := db.Query(SQLgetProduct)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rowsp.Close()
-	var product string
-	for rowsp.Next() {
-		var person Person
-
-		if err := rowsp.Scan(&person.Id, &person.FirstName, &person.LastName, &product); err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println("show:", person.Id, person.FirstName, person.LastName, product)
-	}
-
-	// update product
-	resultu, err := db.Exec(
-		SQLUpdateProduct,
-		"Cake",
-		1,
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(resultu)
 
 	router := gin.Default()
 	router.GET("/test", SomeHandler(db))
 	router.GET("/qs", QueryString(db))
+	router.GET("/gpsloc", GetLoc(db))
+	router.POST("/gpsloc", POSTLoc(db))
+	router.GET("/customer", GetCustomer(db))
 	router.Run(":8080")
 }
